@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#090b10">
+    <title>SUB/WAVE Lyrics</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <main class="display-shell">
+      <section class="track-panel" aria-label="Now playing">
+        <div class="artwork-frame">
+          <img id="artwork" alt="" hidden>
+          <div id="artwork-placeholder" class="artwork-placeholder">SUB/WAVE</div>
+        </div>
+        <div class="track-copy">
+          <p class="eyebrow">Now playing</p>
+          <h1 id="title">Waiting for the station</h1>
+          <p id="artist" class="artist">SUB/WAVE</p>
+          <p id="album" class="album"></p>
+          <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+          <p id="connection" class="connection">Connecting…</p>
+        </div>
+      </section>
+      <section id="lyrics" class="lyrics-panel" aria-live="polite">
+        <p class="empty-state">Waiting for lyrics…</p>
+      </section>
+    </main>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

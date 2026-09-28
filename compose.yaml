@@ -1,0 +1,39 @@
+services:
+  subwave-lyrics:
+    image: ghcr.io/sovereignalmida/subwave-lyrics:${SUBWAVE_LYRICS_VERSION:-latest}
+    container_name: subwave-lyrics
+    restart: unless-stopped
+    init: true
+    read_only: true
+    environment:
+      SUBWAVE_STATION_URL: ${SUBWAVE_STATION_URL:?Set SUBWAVE_STATION_URL to your station origin}
+      SUBWAVE_POLL_INTERVAL: ${SUBWAVE_POLL_INTERVAL:-2}
+      KEEP_STATION_ACTIVE: ${KEEP_STATION_ACTIVE:-true}
+      VIEWER_TTL_SECONDS: ${VIEWER_TTL_SECONDS:-45}
+      LRCLIB_BASE_URL: ${LRCLIB_BASE_URL:-https://lrclib.net}
+      LRCLIB_NEGATIVE_CACHE_HOURS: ${LRCLIB_NEGATIVE_CACHE_HOURS:-12}
+      PLAYBACK_OFFSET_SECONDS: ${PLAYBACK_OFFSET_SECONDS:-22}
+      DATABASE_PATH: /data/lyrics.db
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8095
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - lyrics-data:/data
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-8095}:8095"
+    mem_limit: 256m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8095/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  lyrics-data:

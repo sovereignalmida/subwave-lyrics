@@ -1,0 +1,39 @@
+# Overlay for an existing split-container SUB/WAVE checkout.
+# Run from the SUB/WAVE directory with:
+# docker compose -f docker-compose.yml -f /path/to/compose.subwave.yaml up -d subwave-lyrics
+services:
+  subwave-lyrics:
+    image: ghcr.io/sovereignalmida/subwave-lyrics:${SUBWAVE_LYRICS_VERSION:-latest}
+    container_name: SUBWAVE_LYRICS
+    restart: unless-stopped
+    init: true
+    read_only: true
+    depends_on:
+      controller:
+        condition: service_healthy
+    environment:
+      SUBWAVE_API_URL: http://controller:7701
+      SUBWAVE_STREAM_URL: http://broadcast:7702/stream.mp3
+      KEEP_STATION_ACTIVE: ${KEEP_STATION_ACTIVE:-true}
+      PLAYBACK_OFFSET_SECONDS: ${PLAYBACK_OFFSET_SECONDS:-22}
+      DATABASE_PATH: /data/lyrics.db
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8095
+    volumes:
+      - subwave-lyrics-data:/data
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    ports:
+      - "${LYRICS_BIND_ADDRESS:-0.0.0.0}:${LYRICS_PORT:-8095}:8095"
+    mem_limit: 256m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8095/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  subwave-lyrics-data:
